@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper   
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"   
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bw.mapper.EngineerDao">
+
+<select id="selectProfessionbyName" parameterType="string" resultType="com.bw.entity.Profession">
+select * from t_profession where 
+<if test="_parameter!=null and _parameter!=''">
+pname=#{_parameter}
+</if>
+<if test="_parameter==null and _parameter==''">
+pname=''
+</if>
+</select>
+
+<insert id="insertEngineer" parameterType="engineer">
+insert into t_engineer (ename,sex,area,registname,study,sid1,sid2,zycode,recode,edate) values (
+#{ename},#{sex},#{area},#{registname},#{study},#{sid1},#{sid2},#{zycode},#{recode},#{edate})
+</insert>
+
+
+<select id="findAll" parameterType="map" resultType="map">
+select e.*,p1.pname as pname1,p2.pname as pname2 from t_engineer e LEFT JOIN t_profession p1 on e.sid1=p1.pid LEFT JOIN t_profession p2 on e.sid2=p2.pid 
+ <where>
+<if test="ename!=null and ename!=''">
+ename like concat("%",#{ename},"%")
+</if>
+<if test="area!=null and area!=''">
+and area like concat("%",#{area},"%")
+</if>
+<if test="pid>0">
+ and e.sid1=#{pid} or ename like concat("%",#{ename},"%") and  area like concat("%",#{area},"%") and e.sid2=#{pid} 
+</if> 
+</where> 
+</select>
+
+<select id="selectAll" resultType="com.bw.entity.Profession">
+select * from t_profession
+</select>
+<select id="findOne" resultType="map" parameterType="int">
+select e.*,p1.pname as pname1,p2.pname as pname2 from t_engineer e LEFT JOIN t_profession p1 on e.sid1=p1.pid LEFT JOIN t_profession p2 on e.sid2=p2.pid
+where eid=#{0}
+</select>
+
+<update id="updateEn" parameterType="engineer">
+update t_engineer set ename=#{ename},sex=#{sex},area=#{area},registname=#{registname},study=#{study},sid1=#{sid1},sid2=#{sid2},zycode=#{zycode},recode=#{recode},
+edate=#{edate} where eid=#{eid}
+
+</update>
+
+<delete id="deleteAll">
+delete from t_engineer where eid in
+<foreach collection="array" item="eid" separator="," open="(" close=")">
+#{eid}
+</foreach>
+</delete>
+
+</mapper>
